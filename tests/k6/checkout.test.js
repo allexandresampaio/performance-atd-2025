@@ -1,12 +1,13 @@
 import http from 'k6/http';
 import { sleep, check, group } from 'k6';
-import { SharedArray } from 'k6/data';
-import { scenario } from 'k6/execution';
+//import { SharedArray } from 'k6/data';
+//import { scenario } from 'k6/execution';
+import { randomEmail, randomName, randomPassword } from './helpers/randomData.js';
 
-// Load the data in the init context using a SharedArray.
-const testData = new SharedArray('users', function () {
-  return JSON.parse(open('./test-data/users.json'));
-});
+// // Load the data in the init context using a SharedArray.
+// const testData = new SharedArray('users', function () {
+//   return JSON.parse(open('./test-data/users.json'));
+// });
 
 // Define test options
 export const options = {
@@ -22,11 +23,11 @@ const BASE_URL = __ENV.BASE_URL || "http://localhost:3000"
 
 // Main test function
 export default function () {
-  // Get a specific data object for the current VU iteration
-  const user = testData[scenario.iterationInTest % testData.length];
+//   // Get a specific data object for the current VU iteration
+//   const user = testData[scenario.iterationInTest % testData.length];
 
-  // Create unique email for registration to avoid conflicts
-  const uniqueEmail = `${scenario.iterationInTest}_${user.email}`;
+//   // Create unique email for registration to avoid conflicts
+//   const uniqueEmail = `${scenario.iterationInTest}_${user.email}`;
 
   let responseRegister, responseLogin, responseProducts, responseCheckout;
   let token;
@@ -36,9 +37,9 @@ export default function () {
     responseRegister = http.post(
       `${BASE_URL}/auth/register`,
       JSON.stringify({
-        email: uniqueEmail,
-        password: user.password,
-        name: user.name
+        email: randomEmail(),
+        password: randomPassword(),
+        name: randomName()
       }),
       {
         headers: {
