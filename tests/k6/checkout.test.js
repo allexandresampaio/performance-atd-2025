@@ -6,6 +6,9 @@ import { randomEmail, randomName, randomPassword } from './helpers/randomData.js
 import { login } from './helpers/loginHelper.js'; 
 import { BASE_URL } from './helpers/base_url.js';
 
+//utilizando Trends
+import { Trend } from 'k6/metrics';
+const postCheckoutDurationTrend = new Trend('post_checkout_duration');//analisando o tempo de resposta do checkout
 
 // // Load the data in the init context using a SharedArray.
 // const testData = new SharedArray('users', function () {
@@ -14,8 +17,8 @@ import { BASE_URL } from './helpers/base_url.js';
 
 // Define test options
 export const options = {
-  vus: 1,
-  iterations: 1, //mudei manualmente para ficar menor e não repetir ou zerar estoque
+  vus: 10,
+  iterations: 10, //mudei manualmente para ficar menor e não repetir ou zerar estoque
   thresholds: {
     http_req_duration: ['p(95)<=2000'], // 95th percentile <= 2 seconds
     http_req_failed: ['rate<0.01'] // Less than 1% failure rate
@@ -123,6 +126,9 @@ export default function () {
       'Checkout response has success': (r) => r.json().success === true
     });
   });
+
+  //adicionando informaçãoes na minha Trend para depois ser calculado nos resultados do teste
+  postCheckoutDurationTrend.add(responseCheckout.timings.duration);
 
   // Sleep before next iteration
   sleep(1);
