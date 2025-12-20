@@ -6,6 +6,8 @@ import { randomEmail, randomName, randomPassword } from './helpers/randomData.js
 import { login } from './helpers/loginHelper.js'; 
 import { BASE_URL } from './helpers/base_url.js';
 
+import { Faker } from 'k6/x/faker';
+
 //utilizando Trends
 import { Trend } from 'k6/metrics';
 const postCheckoutDurationTrend = new Trend('post_checkout_duration');//analisando o tempo de resposta do checkout
@@ -35,10 +37,11 @@ export default function () {
 
   let responseRegister, responseLogin, responseProducts, responseCheckout;
   let token="";
+  const faker = new Faker();
   let user = {
     email: randomEmail(),
-    password: randomPassword(),
-    name: randomName()
+    password: faker.internet.password(),
+    name: faker.person.firstName()
   };
 
   // Group for user registration
