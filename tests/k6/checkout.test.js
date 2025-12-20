@@ -3,6 +3,9 @@ import { sleep, check, group } from 'k6';
 //import { SharedArray } from 'k6/data';
 //import { scenario } from 'k6/execution';
 import { randomEmail, randomName, randomPassword } from './helpers/randomData.js';
+import { login } from './helpers/loginHelper.js'; 
+import { BASE_URL } from './helpers/base_url.js';
+
 
 // // Load the data in the init context using a SharedArray.
 // const testData = new SharedArray('users', function () {
@@ -11,15 +14,13 @@ import { randomEmail, randomName, randomPassword } from './helpers/randomData.js
 
 // Define test options
 export const options = {
-  vus: 10,
-  iterations: 10, //mudei manualmente para ficar menor e não repetir ou zerar estoque
+  vus: 1,
+  iterations: 1, //mudei manualmente para ficar menor e não repetir ou zerar estoque
   thresholds: {
     http_req_duration: ['p(95)<=2000'], // 95th percentile <= 2 seconds
     http_req_failed: ['rate<0.01'] // Less than 1% failure rate
   }
 };
-
-const BASE_URL = __ENV.BASE_URL || "http://localhost:3000"
 
 // Main test function
 export default function () {
@@ -30,23 +31,19 @@ export default function () {
 //   const uniqueEmail = `${scenario.iterationInTest}_${user.email}`;
 
   let responseRegister, responseLogin, responseProducts, responseCheckout;
-  let token;
+  let token="";
+  let user = {
+    email: randomEmail(),
+    password: randomPassword(),
+    name: randomName()
+  };
 
   // Group for user registration
   group('Register User', () => {
     responseRegister = http.post(
       `${BASE_URL}/auth/register`,
-      JSON.stringify({
-        email: randomEmail(),
-        password: randomPassword(),
-        name: randomName()
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+      JSON.stringify(user),
+      { headers: { 'Content-Type': 'application/json' }});
 
     // Check for successful registration (status 201)
     check(responseRegister, {
@@ -60,28 +57,14 @@ export default function () {
 
   // Group for user login
   group('Login User', () => {
-    responseLogin = http.post(
-      `${BASE_URL}/auth/login`,
-      JSON.stringify({
-        email: uniqueEmail,
-        password: user.password
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
+    responseLogin = login(user.email, user.password)
+    token = responseLogin.json().data.token;
     // Check for successful login (status 200)
     check(responseLogin, {
-      'Login status is 200': (r) => r.status === 200,
-      'Login response has success': (r) => r.json().success === true,
-      'Login response has token': (r) => r.json().data && r.json().data.token
+        'Login status is 200': (r) => r.status === 200,
+        'Login response has success': (r) => r.json().success === true,
+        'Login response has token': (r) => r.json().data && r.json().data.token
     });
-
-    // Extract token
-    token = responseLogin.json().data.token;
   });
 
   // Small sleep between requests
