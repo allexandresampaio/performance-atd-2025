@@ -6,7 +6,7 @@ import { randomEmail, randomName, randomPassword } from './helpers/randomData.js
 import { login } from './helpers/loginHelper.js'; 
 import { BASE_URL } from './helpers/base_url.js';
 
-import { Faker } from 'k6/x/faker';
+import faker from 'k6/x/faker';
 
 //utilizando Trends
 import { Trend } from 'k6/metrics';
@@ -37,7 +37,6 @@ export default function () {
 
   let responseRegister, responseLogin, responseProducts, responseCheckout;
   let token="";
-  const faker = new Faker();
   let user = {
     email: randomEmail(),
     password: faker.internet.password(),
