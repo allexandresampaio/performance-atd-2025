@@ -20,11 +20,19 @@ const postCheckoutDurationTrend = new Trend('post_checkout_duration');//analisan
 // Define test options
 export const options = {
   vus: 10,
-  iterations: 10, //mudei manualmente para ficar menor e não repetir ou zerar estoque
+  //iterations: 10, //mudei manualmente para ficar menor e não repetir ou zerar estoque
   thresholds: {
     http_req_duration: ['p(95)<=2000'], // 95th percentile <= 2 seconds
     http_req_failed: ['rate<0.01'] // Less than 1% failure rate
-  }
+  },
+
+  //usando stages para controlar o load de rampup e rumpdown dos users
+  stages: [
+    { duration: '10s', target: 10},
+    { duration: '5s', target: 20},
+    { duration: '10s', target: 10},
+    { duration: '3s', target: 0}
+  ]
 };
 
 // Main test function
