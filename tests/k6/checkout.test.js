@@ -28,10 +28,11 @@ export const options = {
 
   //usando stages para controlar o load de rampup e rumpdown dos users
   stages: [
-    { duration: '10s', target: 10},
-    { duration: '5s', target: 20},
-    { duration: '10s', target: 10},
-    { duration: '3s', target: 0}
+    { duration: '3', target: 10},//ramp up
+    { duration: '5s', target: 20},//average
+    { duration: '10s', target: 30},//average
+    { duration: '3s', target: 100},//pike
+    { duration: '3s', target: 0}//ramp down
   ]
 };
 
