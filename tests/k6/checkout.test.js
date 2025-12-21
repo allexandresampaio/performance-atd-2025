@@ -13,7 +13,7 @@ import { Trend } from 'k6/metrics';
 const postCheckoutDurationTrend = new Trend('post_checkout_duration');//analisando o tempo de resposta do checkout
 
 // // Load the data in the init context using a SharedArray.
-// const testData = new SharedArray('users', function () {
+// const users = new SharedArray('users', function () {
 //   return JSON.parse(open('./test-data/users.json'));
 // });
 
@@ -39,10 +39,12 @@ export const options = {
 // Main test function
 export default function () {
 //   // Get a specific data object for the current VU iteration
-//   const user = testData[scenario.iterationInTest % testData.length];
+//   const user = users[__VU - 1];//numero de VUS = numero de itens no JSON
+//   const user = users[(__VU -1) % users.length];//modelo para reaproveitar os dados 
+//   email = user.email;
+//   password = user.password;
+//   name = user.name;
 
-//   // Create unique email for registration to avoid conflicts
-//   const uniqueEmail = `${scenario.iterationInTest}_${user.email}`;
 
   let responseRegister, responseLogin, responseProducts, responseCheckout;
   let token="";
